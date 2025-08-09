@@ -1,15 +1,17 @@
 "use client";
 
-import { signUp } from "@/lib/auth-client";
+import { signUpWithEmailPassword } from "@/lib/auth.actions";
 import { useRouter } from "next/navigation";
-import { FormEvent, useState } from "react";
+import { FormEvent, startTransition, useTransition } from "react";
 import { toast } from "sonner";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 
 export default function RegisterForm() {
-  const [isPending, setisPending] = useState(false);
+  // const [isPending, setisPending] = useState(false);
+
+  const [transition, setStartTransition] = useTransition();
   const router = useRouter();
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
@@ -24,28 +26,15 @@ export default function RegisterForm() {
     const password = String(formData.get("password"));
     if (!password) return toast.error("Please provide your password");
 
-    await signUp.email(
-      {
-        name,
-        email,
-        password,
-      },
-      {
-        onError(ctx) {
-          toast.error(ctx.error.message);
-        },
-        onRequest() {
-          setisPending(true);
-        },
-        onResponse() {
-          setisPending(false);
-        },
-        onSuccess() {
-          toast.success("Successfully signed up. welcome back");
-          router.push("/profile");
-        },
+    startTransition(async () => {
+      const { message, status } = await signUpWithEmailPassword(formData);
+      if (status) {
+        toast.success("Succesfully signed up, welcome back!");
+        router.push("/profile");
+        return;
       }
-    );
+      toast.error(String(message));
+    });
   }
 
   return (
@@ -79,8 +68,8 @@ export default function RegisterForm() {
           placeholder="Enter your password"
         />
       </div>
-      <Button disabled={isPending} type="submit" className="w-full">
-        {isPending ? "Registering...." : "Register"}
+      <Button disabled={transition} type="submit" className="w-full">
+        {transition ? "Registering...." : "Register"}
       </Button>
     </form>
   );

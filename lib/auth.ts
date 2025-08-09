@@ -1,6 +1,9 @@
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
+import { APIError, createAuthMiddleware } from "better-auth/api";
+import { nextCookies } from "better-auth/next-js";
 import { prisma } from "./prisma";
+import { validDomains } from "./utils";
 
 export const auth = betterAuth({
   database: prismaAdapter(prisma, {
@@ -14,7 +17,7 @@ export const auth = betterAuth({
     // better auth automaticlly signs in on the registration unless there is
     //email verification is enabled, but we can disable this behaviour
     // authSign field
-    autoSignIn: false,
+    // autoSignIn: false,
   },
 
   // better auth also generates ids for you ,
@@ -24,10 +27,30 @@ export const auth = betterAuth({
       generateId: false,
     },
   },
+  hooks: {
+    before: createAuthMiddleware(async (context) => {
+      if (context.path === "/sign-up/email") {
+        const domain = context.body.email.split("@")[1];
+        console.log(domain);
+        if (!validDomains(domain))
+          throw new APIError("BAD_REQUEST", {
+            message: "Invalid domain, please use valid domain",
+          });
+      }
 
+      return context;
+    }),
+  },
   session: {
     // expiration time in seconds, 30 days is 1=24*60*60
     // then mutliply by number of days you want, 30*24*60
     expiresIn: 30 * 24 * 60 * 60, // 30 days
   },
+
+  // nextcokkies() takes care of setting cookies for you when u signup or sing
+  // by server actions.
+  plugins: [nextCookies()],
 });
+
+// export erro codes from auth
+export type ErrorCodes = keyof typeof auth.$ERROR_CODES | "UNKNOWN";

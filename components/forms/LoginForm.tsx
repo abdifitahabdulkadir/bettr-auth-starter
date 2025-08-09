@@ -1,8 +1,8 @@
 "use client";
 
-import { signIn } from "@/lib/auth-client";
+import { signInWithEmailPassword } from "@/lib/auth.actions";
 import { useRouter } from "next/navigation";
-import { FormEvent, useState } from "react";
+import { FormEvent, useTransition } from "react";
 import { toast } from "sonner";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
@@ -10,7 +10,9 @@ import { Label } from "../ui/label";
 
 export default function Loginform() {
   const router = useRouter();
-  const [isPending, setIsPending] = useState(false);
+  // const [isPending, setIsPending] = useState(false);
+  const [transition, startTransition] = useTransition();
+
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
@@ -20,27 +22,15 @@ export default function Loginform() {
     const password = String(formData.get("password"));
     if (!password) return toast.error("Please provide your password");
 
-    await signIn.email(
-      {
-        email,
-        password,
-      },
-      {
-        onError(ctx) {
-          toast.error(ctx.error.message);
-        },
-        onRequest() {
-          setIsPending(true);
-        },
-        onResponse() {
-          setIsPending(false);
-        },
-        onSuccess() {
-          toast.success("Successfully signed up. welcome back");
-          router.push("/profile");
-        },
+    startTransition(async () => {
+      const { message, status } = await signInWithEmailPassword(formData);
+      if (status) {
+        toast.success("Succesfully signed In, welcome back!");
+        router.push("/profile");
+        return;
       }
-    );
+      toast.error(String(message));
+    });
   }
 
   return (
@@ -65,8 +55,8 @@ export default function Loginform() {
           placeholder="Enter your password"
         />
       </div>
-      <Button disabled={isPending} type="submit" className="w-full">
-        {isPending ? "login..." : "Login"}
+      <Button disabled={transition} type="submit" className="w-full">
+        {transition ? "login..." : "Login"}
       </Button>
     </form>
   );
