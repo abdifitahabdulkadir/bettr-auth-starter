@@ -1,0 +1,79 @@
+"use client";
+
+import { signUp } from "@/lib/auth-client";
+import { FormEvent } from "react";
+import { toast } from "sonner";
+import { Button } from "../ui/button";
+import { Input } from "../ui/input";
+import { Label } from "../ui/label";
+
+export default function RegisterForm() {
+  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+
+    const formData = new FormData(e.target as HTMLFormElement);
+
+    const name = String(formData.get("name"));
+
+    if (!name) return toast.error("Please provide your name");
+    const email = String(formData.get("email"));
+    if (!email) return toast.error("Please provide your Email");
+    const password = String(formData.get("password"));
+    if (!password) return toast.error("Please provide your password");
+
+    await signUp.email(
+      {
+        name,
+        email,
+        password,
+      },
+      {
+        onError(ctx) {
+          toast.error(ctx.error.message);
+        },
+        onRequest() {},
+        onResponse() {},
+        onSuccess() {
+          toast.success("Successfully signed up. welcome back");
+        },
+      }
+    );
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="max-w-sm space-y-5 w-full">
+      <div className="space-y-2 ">
+        <Label htmlFor="name">Enter Your Name</Label>
+        <Input
+          id="name"
+          // better auth nees to have name for each input
+          name="name"
+          placeholder="Enter your name"
+        />
+      </div>
+      <div className="space-y-2 ">
+        <Label htmlFor="email">Enter Your Email Address</Label>
+        <Input
+          id="email"
+          type="email"
+          // better auth nees to have name for each input
+          name="email"
+          placeholder="seaph@gmail.com"
+        />
+      </div>
+      <div className="space-y-2 ">
+        <Label htmlFor="password">Enter your Password</Label>
+        <Input
+          id="password"
+          // better auth nees to have name for each input
+          name="password"
+          type="password"
+          placeholder="Enter your password"
+        />
+      </div>
+      <Button type="submit" className="w-full">
+        Register
+      </Button>
+    </form>
+  );
+}
