@@ -47,6 +47,19 @@ export const auth = betterAuth({
     expiresIn: 30 * 24 * 60 * 60, // 30 days
   },
 
+  // add other adtions data or fields in your data so the tat will be add
+  // to the user object int he session hooks, no need to use and fetch
+  // from database or some hacky ways. soo strighup really.
+  user: {
+    additionalFields: {
+      role: {
+        type: ["USER", "ADMIN"],
+
+        // this means, I am getting role from user form UI or input.
+        input: false,
+      },
+    },
+  },
   // nextcokkies() takes care of setting cookies for you when u signup or sing
   // by server actions.
   plugins: [nextCookies()],
