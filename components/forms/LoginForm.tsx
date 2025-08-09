@@ -2,7 +2,7 @@
 
 import { signIn } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
-import { FormEvent } from "react";
+import { FormEvent, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
@@ -10,6 +10,7 @@ import { Label } from "../ui/label";
 
 export default function Loginform() {
   const router = useRouter();
+  const [isPending, setIsPending] = useState(false);
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
@@ -28,11 +29,15 @@ export default function Loginform() {
         onError(ctx) {
           toast.error(ctx.error.message);
         },
-        onRequest() {},
-        onResponse() {},
+        onRequest() {
+          setIsPending(true);
+        },
+        onResponse() {
+          setIsPending(false);
+        },
         onSuccess() {
           toast.success("Successfully signed up. welcome back");
-          router.push("/");
+          router.push("/profile");
         },
       }
     );
@@ -60,8 +65,8 @@ export default function Loginform() {
           placeholder="Enter your password"
         />
       </div>
-      <Button type="submit" className="w-full">
-        Login
+      <Button disabled={isPending} type="submit" className="w-full">
+        {isPending ? "login..." : "Login"}
       </Button>
     </form>
   );

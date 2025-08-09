@@ -1,16 +1,19 @@
 "use client";
 
 import { signUp } from "@/lib/auth-client";
-import { FormEvent } from "react";
+import { useRouter } from "next/navigation";
+import { FormEvent, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 
 export default function RegisterForm() {
+  const [isPending, setisPending] = useState(false);
+  const router = useRouter();
+
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-
     const formData = new FormData(e.target as HTMLFormElement);
 
     const name = String(formData.get("name"));
@@ -31,10 +34,15 @@ export default function RegisterForm() {
         onError(ctx) {
           toast.error(ctx.error.message);
         },
-        onRequest() {},
-        onResponse() {},
+        onRequest() {
+          setisPending(true);
+        },
+        onResponse() {
+          setisPending(false);
+        },
         onSuccess() {
           toast.success("Successfully signed up. welcome back");
+          router.push("/profile");
         },
       }
     );
@@ -71,8 +79,8 @@ export default function RegisterForm() {
           placeholder="Enter your password"
         />
       </div>
-      <Button type="submit" className="w-full">
-        Register
+      <Button disabled={isPending} type="submit" className="w-full">
+        {isPending ? "Registering...." : "Register"}
       </Button>
     </form>
   );
