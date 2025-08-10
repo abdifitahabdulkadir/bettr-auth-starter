@@ -6,13 +6,23 @@ import { headers } from "next/headers";
 import Link from "next/link";
 
 export default async function page() {
+  const headerLists = await headers();
   const session = await auth.api.getSession({
-    headers: await headers(),
+    headers: headerLists,
   });
 
   if (!session)
     return <p className="text-destructive text-2xl">Unauthorized User</p>;
 
+  const { success: hasfullAcess } = await auth.api.userHasPermission({
+    headers: headerLists,
+    body: {
+      userId: session.user.id,
+      permission: {
+        posts: ["delete", "update"],
+      },
+    },
+  });
   return (
     <main className=" px-8 py-16 mx-auto container max-w-screen space-y-8 ">
       <div className="space-y-4">
@@ -23,8 +33,17 @@ export default async function page() {
         )}
         <ReturnButton label="Home" href="/" />
         <h2 className="text-3xl font-bold">Welcome to your Proifle</h2>
+
+        <div className="w-full space-y-4">
+          <h3 className="text-3xl font-bold">List of permissoins</h3>
+          {hasfullAcess ? (
+            <Button>Manage all posts</Button>
+          ) : (
+            <Button>Manage Your only</Button>
+          )}
+        </div>
       </div>
-      <pre className="text-sm ">{JSON.stringify(session, null, 2)}</pre>
+      <pre className="text-sm">{JSON.stringify(session, null, 2)}</pre>
 
       <SignOut />
     </main>

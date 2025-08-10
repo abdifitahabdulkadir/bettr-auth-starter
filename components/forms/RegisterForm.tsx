@@ -14,7 +14,7 @@ export default function RegisterForm() {
   const [transition, setStartTransition] = useTransition();
   const router = useRouter();
 
-  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
+  function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const formData = new FormData(e.target as HTMLFormElement);
 
@@ -68,7 +68,7 @@ export default function RegisterForm() {
           placeholder="Enter your password"
         />
       </div>
-      <Button disabled={transition} type="submit" className="w-full">
+      <Button type="submit" disabled={transition} className="w-full">
         {transition ? "Registering...." : "Register"}
       </Button>
     </form>

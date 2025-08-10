@@ -1,13 +1,15 @@
+import ChangeUserRole from "@/components/ChangeUserRole";
 import DeleteUser from "@/components/DeleteUser";
 import ReturnButton from "@/components/ReturnButton";
 import { auth } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
+import { UserRole } from "@/lib/generated/prisma";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
 export default async function AdminDashboard() {
+  const getHeaders = await headers();
   const session = await auth.api.getSession({
-    headers: await headers(),
+    headers: getHeaders,
   });
 
   if (!session) redirect("/auth/login");
@@ -26,9 +28,10 @@ export default async function AdminDashboard() {
       </main>
     );
   }
-  const users = await prisma.user.findMany({
-    orderBy: {
-      role: "desc",
+  const { users } = await auth.api.listUsers({
+    headers: getHeaders,
+    query: {
+      sortBy: "name",
     },
   });
   return (
@@ -46,11 +49,12 @@ export default async function AdminDashboard() {
         <table className="w-full  ">
           <thead>
             <tr className="flex border-b border-black/10 gap-[10px] justify-between w-full">
-              <th className="text-center font-bold">ID</th>
-              <th className="text-center font-bold">Name</th>
-              <th className="text-center font-bold">Email</th>
-              <th className="text-center font-bold">Role</th>
-              <th className="text-center font-bold">Actions</th>
+              <th className="text-center font-bold  ">ID</th>
+              <th className="text-center font-bold  ">Name</th>
+              <th className="text-center font-bold ">Email</th>
+              <th className="text-center font-bold ">Role</th>
+              <th className="text-center font-bold ">Change</th>
+              <th className="text-center font-bold ">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -65,6 +69,13 @@ export default async function AdminDashboard() {
                   <td className="text-sm text-black">{each.name}</td>
                   <td className="text-sm text-black">{each.email}</td>
                   <td className="text-sm text-black">{each.role}</td>
+                  <td className="text-sm text-black">
+                    <ChangeUserRole
+                      userId={each.id}
+                      role={each.role as UserRole}
+                    />
+                  </td>
+
                   <td className="text-sm text-black">
                     <DeleteUser userId={each.id} />
                   </td>

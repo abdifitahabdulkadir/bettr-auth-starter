@@ -2,6 +2,9 @@ import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { APIError, createAuthMiddleware } from "better-auth/api";
 import { nextCookies } from "better-auth/next-js";
+import { admin } from "better-auth/plugins";
+import { UserRole } from "./generated/prisma";
+import { ac, roles } from "./permissions";
 import { prisma } from "./prisma";
 import { validDomains } from "./utils";
 
@@ -54,15 +57,23 @@ export const auth = betterAuth({
     additionalFields: {
       role: {
         type: ["USER", "ADMIN"],
-
-        // this means, I am getting role from user form UI or input.
+        // this means, I am not getting role from user form UI or input.
         input: false,
       },
     },
   },
   // nextcokkies() takes care of setting cookies for you when u signup or sing
   // by server actions.
-  plugins: [nextCookies()],
+  plugins: [
+    nextCookies(),
+    admin({
+      defaultRole: UserRole.USER,
+      adminRoles: [UserRole.ADMIN],
+      ac,
+      roles,
+      // impersonationSessionDuration: 60 * 60 * 2, // two hours
+    }),
+  ],
 });
 
 // export erro codes from auth
