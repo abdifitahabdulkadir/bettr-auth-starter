@@ -12,6 +12,16 @@ export const auth = betterAuth({
   database: prismaAdapter(prisma, {
     provider: "postgresql",
   }),
+  socialProviders: {
+    github: {
+      clientId: process.env.GITHUB_CLIENT_ID!,
+      clientSecret: process.env.GITHUB_SECRET_ID!,
+    },
+    google: {
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_SECRET_ID!,
+    },
+  },
   emailAndPassword: {
     // better minim password length is 8 so wecan make it 6
     minPasswordLength: 6,
@@ -60,6 +70,14 @@ export const auth = betterAuth({
         // this means, I am not getting role from user form UI or input.
         input: false,
       },
+    },
+  },
+  account: {
+    accountLinking: {
+      // if you use same gmail. it will crate one user only
+      // but mitlple accounts , by default is true, and
+      // you can opt-out incase you wnat that .
+      enabled: true,
     },
   },
   // nextcokkies() takes care of setting cookies for you when u signup or sing

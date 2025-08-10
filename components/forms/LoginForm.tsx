@@ -4,6 +4,7 @@ import { signInWithEmailPassword } from "@/lib/auth.actions";
 import { useRouter } from "next/navigation";
 import { FormEvent, useTransition } from "react";
 import { toast } from "sonner";
+import SignInWithOauthButton from "../SignInWithOauthButton";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
@@ -58,6 +59,16 @@ export default function Loginform() {
       <Button disabled={transition} type="submit" className="w-full">
         {transition ? "login..." : "Login"}
       </Button>
+
+      <div className="flex w-full items-center">
+        <div className="h-[2px] flex-[1] grow bg-gray-300 " />
+        <p className="flex-[1] max-w-[20px]">Or</p>
+        <div className="h-[2px] flex-[1] grow bg-gray-300 " />
+      </div>
+      <div className="flex flex-col space-y-5">
+        <SignInWithOauthButton provider={"Google"} signUp={false} />
+        <SignInWithOauthButton provider={"Github"} signUp={false} />
+      </div>
     </form>
   );
 }
