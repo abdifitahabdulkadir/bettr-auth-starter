@@ -34,6 +34,19 @@ export const auth = betterAuth({
 
     // this means it would not let you login in if your email is not verrifeid
     requireEmailVerification: true,
+    resetPasswordTokenExpiresIn: 60 * 30, // this 30 minutes
+    async sendResetPassword({ user, url }) {
+      const link = new URL(url);
+      link.searchParams.set("callbackURL", "/auth/forgetpassword");
+      await sendEmail({
+        to: user.email,
+        subject: emailTemplates.resetPassword.subject,
+        meta: {
+          link: String(link),
+          description: emailTemplates.resetPassword.description,
+        },
+      });
+    },
   },
   emailVerification: {
     sendOnSignIn: true,
@@ -44,10 +57,10 @@ export const auth = betterAuth({
       link.searchParams.set("callbackURL", "/auth/verify");
       await sendEmail({
         to: user.email,
-        subject: "Pleae verifiy your email address",
+        subject: emailTemplates.emailVerification.subject,
         meta: {
           link: String(link),
-          description: "Please verify your link by cliking the Link Below",
+          description: emailTemplates.emailVerification.description,
         },
       });
     },
@@ -116,3 +129,16 @@ export const auth = betterAuth({
 
 // export erro codes from auth
 export type ErrorCodes = keyof typeof auth.$ERROR_CODES | "UNKNOWN";
+
+const emailTemplates = {
+  emailVerification: {
+    subject: "Please Verify Your Emal Address",
+    description:
+      " You have recieved this email to verify your eamil address. anad Click the link below to verify it.",
+  },
+  resetPassword: {
+    subject: "Forget Password",
+    description:
+      "You have recieved this Email to reset your password. Click the link below to Reset Your password.",
+  },
+};

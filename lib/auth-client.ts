@@ -11,6 +11,8 @@ export const {
   useSession,
   admin,
   sendVerificationEmail,
+  requestPasswordReset,
+  resetPassword,
 } = createAuthClient({
   baseURL: process.env.NEXT_PUBLIC_BASE_URL,
 

@@ -26,12 +26,15 @@ export async function sendEmail({ to, subject, meta }: Props) {
       from: process.env.GMAIL_USER,
       to,
       subject: `Bettter Autth ${subject}`,
-      html: emailTempelate({ linkTo: meta.link }),
+      html: emailTempelate({
+        linkTo: meta.link,
+        description: meta.description,
+        buttonText: "Verify Your Email",
+      }),
     });
 
     return { success: true };
   } catch (error) {
-    console.log("sending email:", error);
     return { success: false };
   }
 }

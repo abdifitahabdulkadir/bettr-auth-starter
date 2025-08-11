@@ -1,7 +1,9 @@
 interface Props {
   linkTo: string;
+  description: string;
+  buttonText: string;
 }
-export function emailTempelate({ linkTo }: Props) {
+export function emailTempelate({ linkTo, buttonText, description }: Props) {
   return ` <!doctype html>
 <html>
   <body>
@@ -28,8 +30,8 @@ export function emailTempelate({ linkTo }: Props) {
               <div
                 style="color:#474849;font-size:20px;font-weight:normal;text-align:left;padding:8px 24px 16px 24px"
               >
-                You have recieved this email to verify your eamil address. anad
-                Click the link below to verify it.
+               "${description}"
+      
               </div>
               <div style="text-align:center;padding:12px 24px 32px 24px">
                 <a
@@ -44,7 +46,7 @@ export function emailTempelate({ linkTo }: Props) {
                         >&nbsp;</i
                       ><!
                     [endif]--></span
-                  ><span>Verify Your Email</span
+                  ><span>"${buttonText}"</span
                   ><span
                     ><!--[if mso
                       ]><i

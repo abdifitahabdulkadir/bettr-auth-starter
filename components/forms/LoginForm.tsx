@@ -1,6 +1,7 @@
 "use client";
 
 import { signInWithEmailPassword } from "@/lib/auth.actions";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useTransition } from "react";
 import { toast } from "sonner";
@@ -47,7 +48,15 @@ export default function Loginform() {
         />
       </div>
       <div className="space-y-2 ">
-        <Label htmlFor="password">Enter your Password</Label>
+        <div className="flex justify-between w-full">
+          <Label htmlFor="password">Enter your Password</Label>
+          <Link
+            href={"/auth/sendpasswordreset"}
+            className="italic text-muted-foreground hover:text-foreground"
+          >
+            Forget Password
+          </Link>
+        </div>
         <Input
           id="password"
           // better auth nees to have name for each input
