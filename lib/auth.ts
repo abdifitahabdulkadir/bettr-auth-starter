@@ -6,6 +6,7 @@ import { admin } from "better-auth/plugins";
 import { UserRole } from "./generated/prisma";
 import { ac, roles } from "./permissions";
 import { prisma } from "./prisma";
+import { sendEmail } from "./send-email.action";
 import { validDomains } from "./utils";
 
 export const auth = betterAuth({
@@ -30,7 +31,26 @@ export const auth = betterAuth({
     // better auth automaticlly signs in on the registration unless there is
     //email verification is enabled, but we can disable this behaviour
     // authSign field
-    // autoSignIn: false,
+
+    // this means it would not let you login in if your email is not verrifeid
+    requireEmailVerification: true,
+  },
+  emailVerification: {
+    sendOnSignIn: true,
+    autoSignInAfterVerification: true,
+    expiresIn: 60, // 1 minute
+    async sendVerificationEmail({ user, url }) {
+      const link = new URL(url);
+      link.searchParams.set("callbackURL", "/auth/verify");
+      await sendEmail({
+        to: user.email,
+        subject: "Pleae verifiy your email address",
+        meta: {
+          link: String(link),
+          description: "Please verify your link by cliking the Link Below",
+        },
+      });
+    },
   },
 
   // better auth also generates ids for you ,

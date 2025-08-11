@@ -4,7 +4,14 @@ import { createAuthClient } from "better-auth/react";
 import type { auth } from "./auth";
 import { ac, roles } from "./permissions";
 
-export const { signUp, signOut, signIn, useSession, admin } = createAuthClient({
+export const {
+  signUp,
+  signOut,
+  signIn,
+  useSession,
+  admin,
+  sendVerificationEmail,
+} = createAuthClient({
   baseURL: process.env.NEXT_PUBLIC_BASE_URL,
 
   // if you hve added some aditional fields to the user object in th session
